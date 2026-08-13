@@ -1,4 +1,4 @@
-package com.LifeLoop.disaster_alert_system;
+package com.LifeLoop;
 
 import io.flutter.embedding.android.FlutterActivity;
 
