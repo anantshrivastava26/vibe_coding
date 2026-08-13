@@ -2,7 +2,7 @@ const { admin } = require('../config/firebaseAdmin');
 
 // Must match the Flutter-side channel/sound in lib/services/notification_service.dart
 // and the raw resource at android/app/src/main/res/raw/disaster_alert.m4a.
-const DISASTER_ALERT_CHANNEL_ID = 'disaster_alert_channel';
+const DISASTER_ALERT_CHANNEL_ID = 'disaster_alert_channel_v2';
 const DISASTER_ALERT_SOUND = 'disaster_alert';
 
 async function sendPush(fcmToken, { title, body, data }) {

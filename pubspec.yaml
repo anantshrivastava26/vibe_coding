@@ -46,6 +46,8 @@ dependencies:
   flutter_map: ^7.0.2
   latlong2: ^0.9.1
   intl: ^0.19.0
+  workmanager: ^0.10.7
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:
@@ -57,6 +59,19 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  image_path: "assets/icon/icon.png"
+  android: true
+  min_sdk_android: 23
+  adaptive_icon_background: "#5B1111"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+  web:
+    generate: true
+    image_path: "assets/icon/icon.png"
+    background_color: "#5B1111"
+    theme_color: "#5B1111"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

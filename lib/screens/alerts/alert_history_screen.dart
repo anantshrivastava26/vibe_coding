@@ -34,7 +34,9 @@ class AlertHistoryScreenState extends State<AlertHistoryScreen> {
   }
 
   Future<void> refresh() async {
-    setState(() => _future = _service.fetchMyAlerts());
+    setState(() {
+      _future = _service.fetchMyAlerts();
+    });
     await _future;
   }
 

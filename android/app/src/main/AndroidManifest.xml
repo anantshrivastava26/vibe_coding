@@ -36,7 +36,7 @@
              so they use the custom alert sound even when the app is closed. -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="disaster_alert_channel" />
+            android:value="disaster_alert_channel_v2" />
 
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

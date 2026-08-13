@@ -94,8 +94,15 @@ rather than an error.
 
 ## Notification sound
 
-`src/services/fcm.js` sends every push on the `disaster_alert_channel` Android
+`src/services/fcm.js` sends every push on the `disaster_alert_channel_v2` Android
 channel with the `disaster_alert` sound. That channel and its raw resource
 (`android/app/src/main/res/raw/disaster_alert.m4a`) are declared on the Flutter side,
 so alerts use the custom tone whether the app is in the foreground, background, or
 closed.
+
+Android notification channels are immutable once created on a device, so if the
+channel's sound/importance ever needs to change again, bump the `_v2` suffix
+(here and in `lib/services/notification_service.dart` / the manifest's
+`default_notification_channel_id` meta-data) rather than editing the existing
+channel's settings — otherwise devices that already have the old channel
+cached will keep the old behavior.
