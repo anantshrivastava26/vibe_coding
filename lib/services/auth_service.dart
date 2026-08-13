@@ -48,6 +48,12 @@ class AuthService extends ChangeNotifier {
     await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
   }
 
+  // Firebase sends the reset link itself; the app never sees or sets the new
+  // password. Errors are surfaced so the caller can map them to friendly text.
+  Future<void> sendPasswordReset(String email) async {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email.trim());
+  }
+
   Future<void> logout() async {
     await FirebaseAuth.instance.signOut();
   }

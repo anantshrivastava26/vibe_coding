@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/admin_service.dart';
 import '../../services/auth_service.dart';
+import '../../services/location_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/fade_slide_in.dart';
 import '../../widgets/gradient_scaffold.dart';
+import '../../widgets/page_transitions.dart';
+import '../location/location_picker_screen.dart';
 
 const _categories = ['earthquake', 'flood', 'cyclone', 'wildfire', 'landslide', 'other'];
 const _severities = ['low', 'moderate', 'high', 'critical'];
@@ -28,6 +31,7 @@ class _SimulateDisasterScreenState extends State<SimulateDisasterScreen> {
   String _severity = 'high';
   double _radiusKm = 50;
   bool _busy = false;
+  String? _epicentreLabel;
 
   @override
   void initState() {
@@ -46,6 +50,29 @@ class _SimulateDisasterScreenState extends State<SimulateDisasterScreen> {
     _lat.dispose();
     _lon.dispose();
     super.dispose();
+  }
+
+  // Picking the epicentre on a map is far less error-prone than typing
+  // coordinates when broadcasting to a real region.
+  Future<void> _pickEpicentre() async {
+    final lat = double.tryParse(_lat.text);
+    final lon = double.tryParse(_lon.text);
+    final picked = await Navigator.of(context).push<PickedLocation>(
+      smoothRoute(LocationPickerScreen(
+        initial: lat != null && lon != null
+            ? PickedLocation(latitude: lat, longitude: lon, label: _epicentreLabel)
+            : null,
+        title: 'Pick epicentre',
+        subtitle: 'Everyone within the radius gets alerted',
+        confirmLabel: 'Use as epicentre',
+      )),
+    );
+    if (picked == null) return;
+    setState(() {
+      _lat.text = picked.latitude.toStringAsFixed(5);
+      _lon.text = picked.longitude.toStringAsFixed(5);
+      _epicentreLabel = picked.label;
+    });
   }
 
   Future<void> _submit() async {
@@ -233,6 +260,30 @@ class _SimulateDisasterScreenState extends State<SimulateDisasterScreen> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: _busy ? null : _pickEpicentre,
+                          icon: const Icon(Icons.map_outlined, size: 18),
+                          label: const Text('Pick epicentre on map'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.red600,
+                            side: const BorderSide(color: AppColors.red600),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (_epicentreLabel != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          _epicentreLabel!,
+                          style: const TextStyle(fontSize: 12, color: Colors.black54),
+                        ),
+                      ],
                       const SizedBox(height: 18),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

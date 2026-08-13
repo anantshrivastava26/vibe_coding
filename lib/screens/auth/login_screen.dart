@@ -4,6 +4,7 @@ import '../../services/auth_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/fade_slide_in.dart';
 import '../../widgets/page_transitions.dart';
+import 'forgot_password_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -116,7 +117,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                 validator: (v) =>
                                     (v == null || v.length < 6) ? 'Minimum 6 characters' : null,
                               ),
-                              const SizedBox(height: 24),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: _busy
+                                      ? null
+                                      : () => Navigator.of(context).push(
+                                            smoothRoute(ForgotPasswordScreen(
+                                              initialEmail: _email.text.trim(),
+                                            )),
+                                          ),
+                                  child: const Text('Forgot password?'),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
                               SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton(

@@ -2,6 +2,22 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'api_client.dart';
 
+// A coordinate the user has chosen — from GPS, an address search, or a map tap.
+class PickedLocation {
+  final double latitude;
+  final double longitude;
+  final String? label;
+
+  const PickedLocation({
+    required this.latitude,
+    required this.longitude,
+    this.label,
+  });
+
+  String get coordinates =>
+      '${latitude.toStringAsFixed(4)}, ${longitude.toStringAsFixed(4)}';
+}
+
 class LocationService {
   final ApiClient _api = ApiClient();
 
@@ -34,6 +50,25 @@ class LocationService {
           .join(', ');
     } catch (_) {
       return null;
+    }
+  }
+
+  // Forward-geocodes a free-text place name. Each hit is reverse-geocoded again
+  // so the picker can show a readable address rather than bare coordinates.
+  Future<List<PickedLocation>> searchAddress(String query) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return [];
+    try {
+      final results = await locationFromAddress(trimmed);
+      return Future.wait(
+        results.take(5).map((l) async => PickedLocation(
+              latitude: l.latitude,
+              longitude: l.longitude,
+              label: await reverseGeocode(l.latitude, l.longitude) ?? trimmed,
+            )),
+      );
+    } catch (_) {
+      return [];
     }
   }
 

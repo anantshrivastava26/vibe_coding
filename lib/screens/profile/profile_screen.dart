@@ -4,7 +4,9 @@ import '../../services/auth_service.dart';
 import '../../services/location_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/fade_slide_in.dart';
+import '../../widgets/page_transitions.dart';
 import '../../widgets/press_effect.dart';
+import '../location/location_picker_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -22,16 +24,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final pos = await _location.getCurrentPosition();
       final label = await _location.reverseGeocode(pos.latitude, pos.longitude);
-      await _location.updateLocation(
+      await _save(PickedLocation(
         latitude: pos.latitude,
         longitude: pos.longitude,
         label: label,
-      );
-      if (!mounted) return;
-      await context.read<AuthService>().syncProfile();
-      if (!mounted) return;
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Location updated.')));
+      ));
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -40,6 +37,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     }
     if (mounted) setState(() => _updating = false);
+  }
+
+  // Opens the map picker seeded with whatever location is currently saved.
+  Future<void> _chooseCustomLocation() async {
+    final profile = context.read<AuthService>().profile;
+    final current = profile?.hasLocation == true
+        ? PickedLocation(
+            latitude: profile!.latitude!,
+            longitude: profile.longitude!,
+            label: profile.locationLabel,
+          )
+        : null;
+
+    final picked = await Navigator.of(context).push<PickedLocation>(
+      smoothRoute(LocationPickerScreen(
+        initial: current,
+        title: 'Change location',
+        subtitle: 'Alerts follow the pin you drop here',
+        confirmLabel: 'Save this location',
+      )),
+    );
+    if (picked == null || !mounted) return;
+
+    setState(() => _updating = true);
+    try {
+      await _save(picked);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+        );
+      }
+    }
+    if (mounted) setState(() => _updating = false);
+  }
+
+  Future<void> _save(PickedLocation location) async {
+    await _location.updateLocation(
+      latitude: location.latitude,
+      longitude: location.longitude,
+      label: location.label,
+    );
+    if (!mounted) return;
+    await context.read<AuthService>().syncProfile();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Location updated.')));
   }
 
   @override
@@ -124,6 +168,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _updating ? null : _chooseCustomLocation,
+                      icon: const Icon(Icons.edit_location_alt_outlined, size: 18),
+                      label: const Text('Change location'),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: _updating ? null : _refreshLocation,
                       icon: _updating
@@ -133,7 +186,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Icon(Icons.my_location, size: 18),
-                      label: Text(_updating ? 'Updating…' : 'Update my location'),
+                      label: Text(_updating ? 'Updating…' : 'Sync to my GPS location'),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.red600,
                         side: const BorderSide(color: AppColors.red600),

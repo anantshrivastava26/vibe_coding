@@ -39,6 +39,15 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            // Strip unused Dart-facing Java/Kotlin code and resources. Flutter and
+            // the Firebase SDKs ship their own consumer ProGuard rules, so the
+            // defaults here are enough to keep reflection-based plugin code alive.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }
