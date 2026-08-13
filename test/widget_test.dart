@@ -1,30 +1,37 @@
-// This is a basic Flutter widget test.
+// Widget tests for LifeLoop.
 //
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// The full app requires Firebase initialisation, so these tests cover the
+// pure presentation widgets that carry the alert-severity logic.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:disaster_alert_system/main.dart';
+import 'package:disaster_alert_system/theme/app_theme.dart';
+import 'package:disaster_alert_system/widgets/severity_badge.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('SeverityBadge renders the severity label in upper case', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: SeverityBadge(severity: 'critical')),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('CRITICAL'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  test('severityColor maps each level to a distinct colour', () {
+    final colors = {
+      severityColor('low'),
+      severityColor('moderate'),
+      severityColor('high'),
+      severityColor('critical'),
+    };
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(colors.length, 4);
+  });
+
+  test('severityColor is case insensitive', () {
+    expect(severityColor('CRITICAL'), severityColor('critical'));
   });
 }
