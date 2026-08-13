@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "4696981329",
+    "project_id": "vibe-coding4726",
+    "storage_bucket": "vibe-coding4726.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:4696981329:android:2b34382aec277a6c85dd70",
+        "android_client_info": {
+          "package_name": "com.LifeLoop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGfbeVVynkVhrOHYyRPLOlovii4WkTpww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -52,8 +52,9 @@ backend/node_modules/
 .env.*
 backend/.env
 backend/.env.*
-**/google-services.json
-**/GoogleService-Info.plist
+# Note: android/app/google-services.json is intentionally NOT ignored — it ships
+# inside every distributed APK and is required to build the app from a clone.
+# The Admin SDK private key below is the actual secret and must never be committed.
 **/serviceAccountKey.json
 **/firebase-service-account*.json
 **/*firebase-adminsdk*.json
